@@ -19,6 +19,7 @@ Route::group([
     'prefix' => 'v1',
     'middleware' => ['api']
 ], function () {
+    Route::post("/login", "Login\LoginController@Login");
     Route::post("/createCaptcha", "Common\CaptchaController@generateCaptcha");
     Route::post("/verifyCaptcha", "Common\CaptchaController@verifyCaptcha");
 });
