@@ -15,6 +15,10 @@ use Illuminate\Http\Request;
 Route::post("/oauth/token","\Laravel\Passport\Http\Controllers\AccessTokenController@issueToken")->middleware('addClient');
 
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group([
+    'prefix' => 'v1',
+    'middleware' => ['api']
+], function () {
+    Route::post("/createCaptcha", "Api\Common\CaptchaController@generateCaptcha");
+    Route::post("/verifyCaptcha", "Api\Common\CaptchaController@verifyCaptcha");
 });
