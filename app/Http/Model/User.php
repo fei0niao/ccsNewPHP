@@ -33,8 +33,7 @@ class User extends Authenticatable
     //自定义 oauth passport 登陆用户名 id 可以改成其他字段
     public function findForPassport($username)
     {
-        $agent_id = getAgentID();
-        $user = $this->where('name', $username)->where('agent_id',$agent_id)->where('is_forbid', 0)->first();
+        $user = $this->where('username', $username)->first();
         return $user;
     }
 
