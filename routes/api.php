@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::post("/oauth/token","\Laravel\Passport\Http\Controllers\AccessTokenController@issueToken")->middleware('addClient');
+
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
