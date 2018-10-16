@@ -18,21 +18,20 @@ class LoginController extends Controller
             "password.required" => "密码不能为空"
         ]);
         if ($validator->fails()) {
-            return parent::jsonReturn([], parent::CODE_FAIL, $validator->errors()->first());
+            return failReturn($validator->errors()->first());
         }
         $username = $request->get("username");
         $password = $request->get("password");
         $user = User::where('username', $username)->first();
         if (!$user) {
-            return parent::jsonReturn([], parent::CODE_FAIL, "用户账号或密码错误!");
+            return failReturn("用户账号或密码错误!");
         }
-
         if (!$user->is_allow_login) {
-            return parent::jsonReturn([], parent::CODE_FAIL, "账号已被禁用，请联系客服人员！");
+            return failReturn("账号已被禁用，请联系客服人员！");
         }
-
         $ret = self::getAuthToken($username, $password);
-        return $ret;
+        if(!$ret) return failReturn("用户账号或密码错误!");
+        return jsonReturn($ret);
     }
 
     public static function getAuthToken($username, $password)
@@ -50,6 +49,10 @@ class LoginController extends Controller
             'oauth/token',
             'POST'
         );
-        return $response = \Route::dispatch($proxy);
+        $ret = json_decode(\Route::dispatch($proxy)->getContent(), true);
+        if (!$ret || !isset($ret['access_token'])) {
+            return false;
+        }
+        return $ret;
     }
 }
