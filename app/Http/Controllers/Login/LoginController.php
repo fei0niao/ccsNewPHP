@@ -40,8 +40,8 @@ class LoginController extends Controller
         $request = request();
         $request->request->add([
             'grant_type' => "password",
-            'client_id' => env("CLIENT_ID"),
-            'client_secret' => env("CLIENT_SECRET"),
+            'client_id' => config("env.CLIENT_ID"),
+            'client_secret' => config("env.CLIENT_SECRET"),
             'username' => $username,
             'password' => $password,
             'scope' => ''
