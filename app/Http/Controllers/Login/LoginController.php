@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Login;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Model\User;
+use Illuminate\Support\Facades\DB;
 
 class LoginController extends Controller
 {
@@ -54,5 +55,17 @@ class LoginController extends Controller
             return false;
         }
         return $ret;
+    }
+
+    public function logout(Request $request){
+        //注销token
+        $jwtInfo = parsePassportAuthorization($request);
+        if ($jwtInfo) {
+            $jti = $jwtInfo["jti"];
+            DB::table("oauth_access_tokens")->where("id", $jti)->delete();
+            DB::table("oauth_refresh_tokens")->where("access_token_id", $jti)->delete();
+        }
+
+        return jsonReturn([]);
     }
 }

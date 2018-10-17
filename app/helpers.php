@@ -1,4 +1,7 @@
 <?php
+use Lcobucci\JWT\Parser;
+use Illuminate\Support\Facades\DB;
+
 function jsonReturn($data = [], string $message = '', int $code_status = 1, $isDebug = false)
 {
     $json['status'] = $code_status ? 1 : 0;
@@ -28,3 +31,22 @@ function failReturn(string $message = '', $isDebug = false)
     exit;
 }
 
+if (!function_exists("parsePassportAuthorization")) {
+    function parsePassportAuthorization($request)
+    {
+        $authorization = $request->header("Authorization");
+        $jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $authorization));
+        try {
+            $token = (new Parser())->parse($jwt);
+            $data = [
+                "sub" => $token->getClaim("sub"),   //用户id
+                "jti" => $token->getClaim("jti"),   //加密token值
+                //要其他数据自己取
+            ];
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return $data;
+    }
+}

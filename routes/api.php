@@ -29,4 +29,5 @@ Route::group([
    'middleware' => ['auth:api']
 ], function (){
     Route::post("/loginInfo","Admin\AdminUsersController@userInfo");
+    Route::post("/logout","Login\LoginController@Logout");
 });
