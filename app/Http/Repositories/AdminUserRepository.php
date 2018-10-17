@@ -8,31 +8,23 @@
 
 namespace App\Http\Repositories;
 
-
-use App\Http\Model\SystemSetting;
-
 class AdminUserRepository
 {
-    public function getInfo($user){
-        $data['systemParam'] = $this->getSystemParam();
-        $data['userInfo'] = collect($user->toArray())->forget(['password','id','agent_id','name'])->all();
-        $data['permission'] = $this->getPermission($user);
+    public static function getInfo($user)
+    {
+        $SystemSettingParams = [
+            'where' => [
+                'agent_id' => $user->agent_id
+            ]
+        ];
+        $data['systemParam'] = SystemSettingRepository::getList($SystemSettingParams);
+        $data['userInfo'] = collect($user->toArray())->forget(['password', 'id', 'agent_id', 'name'])->all();
+        $AdminPermissionParams = [
+            'adminRolePermission' => ''
+        ];
+        $data['permission'] = AdminPermissionRepository::getList($AdminPermissionParams);
+        //var_dump(\DB::getQueryLog());
+        dd($data['permission']->toArray());
         return $data;
-    }
-
-
-    private function getPermission($user){
-        return "";
-    }
-
-    private function getSystemParam(){
-        $data = SystemSetting::query()
-            ->select('param_key','param_value')
-            ->get();
-        $res = [];
-        $data->map(function ($val,$key)use(&$res){
-            $res[$val->param_key] = $val->param_value;
-        });
-        return $res;
     }
 }

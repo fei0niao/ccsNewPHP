@@ -17,6 +17,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
+        //开启 sql 语句打印
+        if (config('app.debug')) {
+            \DB::enableQueryLog();
+        }
         User::observe(UserObserver::class);
     }
 

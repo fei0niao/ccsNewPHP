@@ -4,7 +4,7 @@ namespace App\Http\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SystemSetting extends Base
+class QrCode extends Base
 {
-    protected $table = 'system_setting';
+    protected $table = "qr_code";
 }

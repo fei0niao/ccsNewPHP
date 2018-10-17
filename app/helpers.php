@@ -2,12 +2,12 @@
 use Lcobucci\JWT\Parser;
 use Illuminate\Support\Facades\DB;
 
-function jsonReturn($data = [], string $message = '', int $code_status = 1, $isDebug = false)
+function jsonReturn($data = [], string $message = '', int $code_status = 1)
 {
     $json['status'] = $code_status ? 1 : 0;
     $json['data'] = $data;
     $json['msg'] = $message;
-    if ($isDebug) {
+    if (config('app.debug')) {
         $json['debug_sql'] = \DB::getQueryLog();
     }
 
@@ -17,12 +17,12 @@ function jsonReturn($data = [], string $message = '', int $code_status = 1, $isD
     exit;
 }
 
-function failReturn(string $message = '', $isDebug = false)
+function failReturn(string $message = '')
 {
     $json['status'] = 0;
     $json['data'] = [];
     $json['msg'] = $message;
-    if ($isDebug) {
+    if (config('app.debug')) {
         $json['debug_sql'] = \DB::getQueryLog();
     }
     //这里没返回一个response对象而直接结束，因为可能在除控制器外的其他地方会调用
