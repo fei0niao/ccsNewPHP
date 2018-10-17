@@ -189,7 +189,7 @@ class Base extends Model
         if (!empty($params['where'])) {
             foreach ($params['where'] as $k => $v) {
                 if ($v === null) continue;
-                if (count($v) == 2) {
+                if (is_array($v) && count($v) == 2) {
                     $where[] = [$k, $v[0], $v[1]];
                 } else {
                     $where[] = [$k, $v];
