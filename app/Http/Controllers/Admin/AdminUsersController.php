@@ -24,7 +24,7 @@ class AdminUsersController extends Controller
             $data = $this->adminUserRepository->getInfo($user);
             return jsonReturn($data);
         }catch (\Exception $exception){
-            dd($exception->getMessage());
+            dd($exception);
             return failReturn("未知错误发生！请稍后再试！");
         }
     }
