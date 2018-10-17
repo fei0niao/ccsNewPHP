@@ -30,4 +30,5 @@ Route::group([
 ], function (){
     Route::post("/loginInfo","Admin\AdminUsersController@userInfo");
     Route::post("/logout","Login\LoginController@Logout");
+    Route::post("/updatePwd","Login\LoginController@updatePwd");
 });

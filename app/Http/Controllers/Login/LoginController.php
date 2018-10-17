@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Login;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Model\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -67,5 +70,33 @@ class LoginController extends Controller
         }
 
         return jsonReturn([]);
+    }
+
+    public function updatePwd(Request $request){
+        $validator =  Validator::make($request->all(),[
+            'oldPass' => 'required',
+            'newPass' => 'required',
+            'rePass' => 'required',
+        ],[
+            'oldPass.required' => "必须填写原密码",
+            'newPass.required' => "必须填写新密码",
+            'rePass.required' => "必须填写新密码",
+        ]);
+        if($validator->fails()){
+            return failReturn($validator->errors()->first());
+        }
+        if($request->input("newPass") === $request->input("oldPass")){
+            return failReturn("原密码与修改后密码一致");
+        }
+        if($request->input("newPass") !== $request->input("rePass")){
+            return failReturn("两次密码不一致");
+        }
+        if(!Hash::check($request->input('oldPass'), Auth::user()->password)){
+            return failReturn("原密码错误");
+        }
+        $user = Auth::user();
+        $user->password = Hash::make($request->input('newPass'));
+        $user->save();
+        return jsonReturn([],'更新密码成功');
     }
 }
