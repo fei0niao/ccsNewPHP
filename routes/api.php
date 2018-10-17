@@ -23,3 +23,10 @@ Route::group([
     Route::post("/createCaptcha", "Common\CaptchaController@generateCaptcha");
     Route::post("/verifyCaptcha", "Common\CaptchaController@verifyCaptcha");
 });
+
+Route::group([
+   'prefix' => 'v1',
+   'middleware' => ['auth:api']
+], function (){
+    Route::post("/loginInfo","Admin\AdminUsersController@userInfo");
+});
