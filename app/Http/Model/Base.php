@@ -202,7 +202,7 @@ class Base extends Model
             $query->where(function ($orWhereQuery) use ($orWhere) {
                 foreach ($orWhere as $k => $v) {
                     if ($v === null) continue;
-                    if (count($v) == 2) {
+                    if (is_array($v) && count($v) == 2) {
                         $orWhereQuery->orWhere($k, $v[0], $v[1]);
                     } else {
                         $orWhereQuery->orWhere($k, $v);
