@@ -20,11 +20,14 @@ class AdminUserRepository
         $data['systemParam'] = SystemSettingRepository::getList($SystemSettingParams);
         $data['userInfo'] = collect($user->toArray())->forget(['password', 'id', 'agent_id', 'name'])->all();
         $AdminPermissionParams = [
-            'adminRolePermission' => ''
+            'adminRolePermission' => '',
+            'has' => [
+                'adminRolePermission' => [
+                    'where' => ['role_id' => $user->role_id]
+                ]
+            ]
         ];
-        $data['permission'] = AdminPermissionRepository::getList($AdminPermissionParams);
-        //var_dump(\DB::getQueryLog());
-        dd($data['permission']->toArray());
+        $data['permission'] = AdminPermissionRepository::getList($AdminPermissionParams)->pluck('name')->all();
         return $data;
     }
 }

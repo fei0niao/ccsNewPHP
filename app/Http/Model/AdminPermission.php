@@ -10,6 +10,6 @@ class AdminPermission extends Base
 
     public function adminRolePermission()
     {
-        return $this->belongsTo(AdminRolePermission::class, 'permission_id');
+        return $this->belongsTo(AdminRolePermission::class, 'id', 'permission_id');
     }
 }
