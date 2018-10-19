@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Customer extends Base
 {
     protected $table = "customer";
+    protected $fillable = ['name','userName','cellphone','password','service_fee','cust_capital_amount','merchant_id','is_login_forbidden','agent_id',"loginName"];
+    protected $hidden = [
+        'password','public_key'
+    ];
+
 
     public function Agent(){
         return $this->belongsTo(Agent::class,'agent_id','id');

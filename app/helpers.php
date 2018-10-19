@@ -1,6 +1,7 @@
 <?php
 use Lcobucci\JWT\Parser;
 use Illuminate\Support\Facades\DB;
+use App\Http\Model\User;
 
 function jsonReturn($data = [], string $message = '', int $code_status = 1)
 {
@@ -48,5 +49,50 @@ if (!function_exists("parsePassportAuthorization")) {
         }
 
         return $data;
+    }
+}
+
+if (!function_exists("getAgent")) {
+    function getAgent(User $user){
+        if($user->agent_id){
+            $agent = \App\Http\Model\Agent::query()
+                ->where("id",$user->agent_id)
+                ->select('name','level','fee_rate','account_left')
+                ->first()
+                ->toArray();
+            return $agent;
+        }else{
+            return [];
+        }
+    }
+}
+if (!function_exists("makeMerchant")) {
+    function makeMerchant() {
+        $str = "";
+        $code = "abcdefghijkmnopqrstuvwxyz1234567890";
+        for ($i = 0; $i < 16; $i++){
+            $str.= $code[mt_rand(0,strlen($code)-1)];
+        }
+        return $str;
+    }
+}
+
+/*
+ * 负载均衡用户真实ip
+ * @return ip
+ * */
+if(!function_exists("getRealIp")){
+    function getRealIp(){
+        if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
+            $ipArr=explode(',',$_SERVER['HTTP_X_FORWARDED_FOR']);
+            $ip = $ipArr[0];
+            return $ip;
+        }
+        if(isset($_SERVER['HTTP_WL_PROXY_CLIENT_IP'])){
+            $ip = $_SERVER['HTTP_WL_PROXY_CLIENT_IP'];
+            return $ip;
+        }
+        $ip = request()->ip();
+        return $ip == '::1'?'127.0.0.1':$ip;
     }
 }

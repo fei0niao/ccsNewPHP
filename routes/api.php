@@ -32,4 +32,9 @@ Route::group([
     Route::post("/logout","Login\LoginController@Logout");
     Route::post("/updatePwd","Login\LoginController@updatePwd");
     Route::post("/customers","Admin\CustomerController@customerList");
+    Route::post("/addCustomer",'Admin\CustomerController@createCustomer');
+    Route::post('/getCustomerInfo',"Admin\CustomerController@getOneCustomer");
+    Route::post("/updateBaseInfo","Admin\CustomerController@updateInfo");
+    Route::post("/updateCustomerFee","Admin\CustomerController@updateFee");
+    Route::post("/CustomerRecharge","Admin\CustomerController@recharge");orderList
 });

@@ -329,14 +329,14 @@ class Base extends Model
         if ($name == 'SystemOperateLog' || $name == 'SystemLoginLog') return;//关键 日志表模型不能有日志 否则会产生多条记录
         self::creating(function ($model) {
         });
-        self::created(function ($model) use ($name) {
-            static::operate_log($model, '创建' . $name);
-        });
+//        self::created(function ($model) use ($name) {
+//            static::operate_log($model, '创建' . $name);
+//        });
         self::updating(function ($model) {
         });
-        self::updated(function ($model) use ($name) {
-            static::operate_log($model, '更新' . $name, 1);
-        });
+//        self::updated(function ($model) use ($name) {
+//            static::operate_log($model, '更新' . $name, 1);
+//        });
         self::deleting(function ($model) {
         });
         self::deleted(function ($model) use ($name) {
@@ -353,11 +353,11 @@ class Base extends Model
             return;
         }
         $params = [
-            'url' => request()->url(),
             'ip' => getRealIp(),
-            'sys_user' => $user->id,
-            'sys_user_name' => $user->name,
-            'role_id' => $user->role_id,
+            'user_id' => $user->id,
+            'input' => json_encode(request()->all()),
+            'path'  => request()->url(),
+            'method' => request()->method(),
             'remark' => $remark
         ];
         if ($flag) {

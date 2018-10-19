@@ -34,7 +34,8 @@ class CustomerRepository
         if($agents){
             $list = $list->where('agent_id','in',$agents);
         }
-        $data=$list->with(['Agent' => function($query){
+        $data=$list->orderBy('id',"DESC")
+            ->with(['Agent' => function($query){
              $query->select('id','name');
         }])
             ->paginate($limt);
@@ -44,7 +45,7 @@ class CustomerRepository
             if(!$agentId){
                 $val['canPlay'] = true;
             }
-            if(!$agentId || $agentId == $val['agent']['id']){
+            if($agentId == $val['agent']['id']){
                 $val['canRecharge'] = true;
                 $val['canChange'] = true;
             }

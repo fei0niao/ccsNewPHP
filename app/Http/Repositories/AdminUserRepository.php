@@ -18,7 +18,8 @@ class AdminUserRepository
             ]
         ];
         $data['systemParam'] = SystemSettingRepository::getList($SystemSettingParams);
-        $data['userInfo'] = collect($user->toArray())->forget(['password', 'id', 'agent_id', 'name'])->all();
+        $agent = getAgent($user);
+        $data['userInfo'] = array_merge(collect($user->toArray())->forget(['password', 'id', 'agent_id', 'name'])->all(),$agent);
         $AdminPermissionParams = [
             'adminRolePermission' => '',
             'has' => [

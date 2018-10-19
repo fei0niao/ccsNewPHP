@@ -11,4 +11,8 @@ class Agent extends Base
     public function getSelfRelationAttribute(){
         return $this->relation . $this->id . '%';
     }
+
+    public function getAccountLeftAttribute($value){
+        return sprintf("%.3f", $value);
+    }
 }
