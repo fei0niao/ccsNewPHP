@@ -36,5 +36,7 @@ Route::group([
     Route::post('/getCustomerInfo',"Admin\CustomerController@getOneCustomer");
     Route::post("/updateBaseInfo","Admin\CustomerController@updateInfo");
     Route::post("/updateCustomerFee","Admin\CustomerController@updateFee");
-    Route::post("/CustomerRecharge","Admin\CustomerController@recharge");orderList
+    Route::post("/CustomerRecharge","Admin\CustomerController@recharge");
+    Route::post("/orderList","Admin\CustomerController@orderList");
+    Route::post("/customerFlowList","Admin\CustomerController@flowList");
 });

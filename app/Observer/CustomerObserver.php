@@ -41,7 +41,8 @@ class CustomerObserver
                     'cust_id' => $dirty['id'] ?? $origin['id'],
                     'flow_type' => 1,
                     'account_left' => $dirty['cust_capital_amount'],
-                    'amount_of_account' => $amount_of_account
+                    'amount_of_account' => $amount_of_account,
+                    'remark'  => $origin ? '商户充值' :  '新增商户初始金额'
                 ];
                 // 商户余额被更改生成商户流水
                 CustAccountFlow::create($data);

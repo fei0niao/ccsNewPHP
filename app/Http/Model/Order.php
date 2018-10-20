@@ -28,4 +28,20 @@ class Order extends Base
                 return "未知";
         }
     }
+
+    public function getTypeAttribute($status)
+    {
+        switch ($status){
+            case 1:
+                return "支付宝支付";
+            case 2:
+                return "微信支付";
+            default:
+                return "未知";
+        }
+    }
+
+    public function customer(){
+        return $this->belongsTo(Customer::class,'merchant_id','merchant_id');
+    }
 }

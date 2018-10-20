@@ -26,6 +26,7 @@ class CustomerController
             $list = CustomerRepository::getCustomerList($user);
             return jsonReturn($list);
         }catch (\Exception $exception){
+            dd($exception);
             return failReturn("未知错误发生！请稍后再试！");
         }
     }
@@ -188,6 +189,28 @@ class CustomerController
             DB::rollback();
             return failReturn('未知错误发生！');
             \Log::info($exception);
+        }
+    }
+
+    public function orderList(){
+        $user = Auth::user();
+        try{
+            $list = CustomerRepository::getOrderList($user);
+            return jsonReturn($list);
+        }catch (\Exception $exception){
+            return failReturn("未知错误发生！请稍后再试！");
+        }
+    }
+
+
+    public function flowList(){
+        $user = Auth::user();
+        try{
+            $list = CustomerRepository::getFlowList($user);
+            return jsonReturn($list);
+        }catch (\Exception $exception){
+            dd($exception);
+            return failReturn("未知错误发生！请稍后再试！");
         }
     }
 }
