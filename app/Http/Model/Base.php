@@ -16,6 +16,7 @@ class Base extends Model
 {
     public static $user = '';
     public static $modelName = '';
+    protected $guarded = [];//没有此属性不能批量赋值
 
     protected $roundFields = []; //数据保留3位有效小数
 
@@ -25,7 +26,7 @@ class Base extends Model
     public static $_selects = [];//需要提交sql查询的字段
     public static $append_fields = [];//附加字段配置 不属于sql字段
     public static $_fields = [];//特殊情况:既属于sql字段 又依赖其它字段
-    const BASE_PARAMS = ['field', 'where', 'orWhere', 'search', 'whereIn', 'whereBetween', 'whereNull', 'has', 'count', 'order', 'offset', 'limit', 'getType', 'keyword', 'extra'];
+    const BASE_PARAMS = ['field', 'where', 'orWhere', 'search', 'whereIn', 'whereBetween', 'whereNull', 'has', 'count', 'order', 'offset', 'limit', 'keyword', 'extra'];
 
 
     public function __construct(array $attributes = [])
@@ -72,12 +73,14 @@ class Base extends Model
         static::$modelName = get_class($model);
         static::$append_fields = $model::$append_fields;
         static::$_fields = $model::$_fields;
-        if (!static::$append_fields && !static::$_fields) return $query->select($val);
+        $noNeedSelect = in_array('*', $val);
+        static::$_appends = static::$_hiddens = static::$_visibles = [];//初始化 否则自己关联自己（父子)的场景会报错
+        if (!$noNeedSelect && !static::$append_fields && !static::$_fields) return $query->select($val);
+        //参数变成数组
         if (!is_array($val)) {
             $val = func_get_args();
             array_shift($val);//第一个参数为$query去掉
         }
-        $noNeedSelect = in_array('*', $val);
         if ($noNeedSelect) {
             foreach ($val as $k => $v) {
                 if ($v == '*' || strpos($v, ' as ')) continue;
@@ -101,7 +104,6 @@ class Base extends Model
             } else {
                 static::assignSelects($v);
             }
-
         }
         return $query->select(static::$_selects[static::$modelName]);
     }
@@ -131,13 +133,10 @@ class Base extends Model
         return $query;
     }
 
-    //直接解析并得到最终结果
-    public function scopeGets($query, array $params)
+    //创建数据的权限控制
+    public function scopeCreatePermission($query)
     {
-        $querys = $this->scopeQuerys($query, $params);
-        $rs['count'] = $querys->count;
-        $rs['list'] = $querys->get();
-        return $rs;
+        return $query;
     }
 
     //过滤参数 若有部分自定义参数 则执行指定代码
@@ -172,8 +171,16 @@ class Base extends Model
                 unset($v_params['count']);
             }
             //若排除掉count字段 还有其它字段 则with加载
-            $query->with([$k_model_name => function ($k_query) use ($v_params) {
-                if(!$v_params) return $k_query;
+            $query->with([$k_model_name => function ($k_query) use ($v_params, $k_model_name) {
+                if (!$v_params) return $k_query;
+                //自动将主键加入with中的field查询
+                if (!empty($v_params['field']) && !in_array('*', $v_params['field'])) {
+                    if ($k_query instanceof Relations\BelongsTo) {
+                        $v_params['field'][] = $k_query->getOwnerKey();
+                    } elseif ($k_query instanceof Relations\HasOne) {
+                        $v_params['field'][] = $k_query->getForeignKeyName();
+                    }
+                }
                 //引用自己 递归执行
                 $this->scopeQuerys($k_query, $v_params);
             }]);
@@ -322,54 +329,5 @@ class Base extends Model
     public static function boot()
     {
         parent::boot();
-        if (!static::$user) {
-            static::$user = Auth::user(); //避免多次调用
-        }
-        $name = substr(get_called_class(), (int)strrpos(get_called_class(), '\\') + 1);
-        if ($name == 'SystemOperateLog' || $name == 'SystemLoginLog') return;//关键 日志表模型不能有日志 否则会产生多条记录
-        self::creating(function ($model) {
-        });
-//        self::created(function ($model) use ($name) {
-//            static::operate_log($model, '创建' . $name);
-//        });
-        self::updating(function ($model) {
-        });
-//        self::updated(function ($model) use ($name) {
-//            static::operate_log($model, '更新' . $name, 1);
-//        });
-        self::deleting(function ($model) {
-        });
-        self::deleted(function ($model) use ($name) {
-            self::operate_log($model, '删除' . $name);
-        });
-    }
-
-
-    //写日志 flag=0时为创建或其他 flag=1时为更新 以后可扩展flag=2时为删除只记录删除id
-    protected static function operate_log($model, $remark, $flag = 0)
-    {
-        $user = static::$user;
-        if (!$user) {
-            return;
-        }
-        $params = [
-            'ip' => getRealIp(),
-            'user_id' => $user->id,
-            'input' => json_encode(request()->all()),
-            'path'  => request()->url(),
-            'method' => request()->method(),
-            'remark' => $remark
-        ];
-        if ($flag) {
-            //原参数
-            $original_params = array_diff_assoc($model->original, $model->attributes);
-            //更新后的参数
-            $request_params = request()->all();//array_diff_assoc($model->attributes, $model->original);
-            $params['request_params'] = str_replace('\\', '', json_encode($request_params));
-            $params['original_params'] = str_replace('\\', '', json_encode($model->original));
-        } else {
-            $params['request_params'] = str_replace('\\', '', json_encode($model->attributes));
-        }
-        AdminOperationLog::create($params);
     }
 }

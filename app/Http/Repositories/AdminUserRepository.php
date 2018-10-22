@@ -7,28 +7,29 @@
  */
 
 namespace App\Http\Repositories;
+use App\Http\Model\User;
 
-class AdminUserRepository
+class AdminUserRepository extends BaseRepository
 {
-    public static function getInfo($user)
+    public static function getList($params, $val = '', $query = '')
     {
-        $SystemSettingParams = [
-            'where' => [
-                'agent_id' => $user->agent_id
-            ]
-        ];
-        $data['systemParam'] = SystemSettingRepository::getList($SystemSettingParams);
+        if (!$query) $query = User::query();
+        return BaseRepository::lists($params, $val, $query);
+    }
+
+    public static function getInfo($id, $params, $val = '', $query = '')
+    {
+        if (!$query) $query = User::query();
+        return BaseRepository::info($id, $params, $val, $query);
+    }
+
+    public static function getLoginInfo($user)
+    {
+        $data['systemParam'] = SystemSettingRepository::getList('agent_id', $user->agent_id);
         $agent = getAgent($user);
-        $data['userInfo'] = array_merge(collect($user->toArray())->forget(['password', 'id', 'agent_id', 'name'])->all(),$agent);
-        $AdminPermissionParams = [
-            'adminRolePermission' => '',
-            'has' => [
-                'adminRolePermission' => [
-                    'where' => ['role_id' => $user->role_id]
-                ]
-            ]
-        ];
-        $data['permission'] = AdminPermissionRepository::getList($AdminPermissionParams)->pluck('name')->all();
+        $data['userInfo'] = collect($user->toArray())->forget(['password', 'id', 'agent_id', 'name'])->all() + $agent;
+        $permission_ids = $user->adminRolePermission->pluck('permission_id')->all();
+        $data['permission'] = AdminPermissionRepository::getList('id',$permission_ids)->pluck('name')->all();
         return $data;
     }
 }

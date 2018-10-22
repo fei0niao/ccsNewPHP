@@ -31,6 +31,12 @@ Route::group([
     Route::post("/loginInfo","Admin\AdminUsersController@userInfo");
     Route::post("/logout","Login\LoginController@Logout");
     Route::post("/updatePwd","Login\LoginController@updatePwd");
+    Route::post("/agentList","Agent\AgentController@lists");
+    Route::post("/agentInfo/{id?}","Agent\AgentController@info");
+    Route::post("/agent/create","Agent\AgentController@create");
+    Route::post("/agent/agentCreate","Agent\AgentController@agentCreate");
+    Route::post("/agent/update/{id}","Agent\AgentController@update");
+    Route::post("/user/create","Admin\AdminUsersController@create");
     Route::post("/customers","Admin\CustomerController@customerList");
     Route::post("/addCustomer",'Admin\CustomerController@createCustomer');
     Route::post('/getCustomerInfo',"Admin\CustomerController@getOneCustomer");
