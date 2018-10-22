@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Model;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,14 +13,31 @@ class User extends Authenticatable
     use Notifiable, HasApiTokens;
     protected $table = "admin_users";
 
+    public static $append_fields = [
+    ];
+    public static $_fields = [];
+
     //belongs to角色
-    public function role()
+    public function adminRole()
     {
-        return $this->belongsTo(Role::class,'role_id','id');
+        return $this->belongsTo(AdminRole::class, 'role_id', 'id');
+    }
+
+    //belongs to代理商
+    public function agent()
+    {
+        return $this->belongsTo(Agent::class, 'agent_id', 'id');
+    }
+
+
+    public function adminRolePermission()
+    {
+        return $this->hasMany(AdminRolePermission::class, 'agent_id', 'id');
     }
 
     //新加字段
-    public function  getNewIsForbidAttribute(){
+    public function getNewIsForbidAttribute()
+    {
         switch ($this->attributes['is_forbid']) {
             case 0:
                 return '正常';

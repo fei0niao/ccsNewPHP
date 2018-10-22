@@ -10,18 +10,11 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminUsersController extends Controller
 {
-
-    private $adminUserRepository = null;
-    public function __construct(AdminUserRepository $adminUserRepository)
-    {
-        $this->adminUserRepository = $adminUserRepository;
-    }
-
     public function userInfo(Request $request)
     {
         $user = Auth::user();
         try{
-            $data = $this->adminUserRepository->getInfo($user);
+            $data = AdminUserRepository::getLoginInfo($user);
             return jsonReturn($data);
         }catch (\Exception $exception){
             dd($exception);
@@ -55,5 +48,29 @@ TYO6yiMWh2k4vJ9bLEUNPeQbRemEJ/q1p5uvP0FfeVt1
         $url = env('WebUrl')."/AdminLogin?access_token=".$token;
         header("location:".$url);
         exit();
+    }
+
+    public function create(Request $request)
+    {
+        $fieldAble = ['agent_id','username','password','name','avatar','is_allow_login','role_id'];
+        $params = $request->only($fieldAble);
+        $validator = AdminUserRepository::validates($params, $fieldAble);
+        if ($validator->fails()) {
+            return failReturn($validator->errors()->first());
+        }
+        $user = \Auth::user();
+        $agent = $user->agent;
+        if ($params['fee_rate'] > $user->agent->fee_rate) {
+            return failReturn('代理商费率超过其父级！');
+        }
+        $arr = [
+            'parent_id' => $agent->id,
+            'level' => $agent->level + 1,
+            'relation' => $agent->relation . '_' . $agent->id
+        ];
+        $params += $arr;
+        $rs = Agent::createPermission()->create($params);
+        if (!$rs) return failReturn('创建失败！');
+        return jsonReturn([], '创建成功！');
     }
 }

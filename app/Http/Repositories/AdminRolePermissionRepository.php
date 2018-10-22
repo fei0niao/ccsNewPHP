@@ -11,17 +11,17 @@ namespace App\Http\Repositories;
 
 use App\Http\Model\AdminRolePermission;
 
-class AdminRolePermissionRepository
+class AdminRolePermissionRepository extends BaseRepository
 {
-    public static function getList($params){
-        return \Cache::remember(__METHOD__ . json_encode($params), null, function () use ($params) {
-            return AdminRolePermission::querys($params)->get();
-        });
+    public static function getList($params, $val = '', $query = '')
+    {
+        if (!$query) $query = AdminRolePermission::query();
+        return BaseRepository::lists($params, $val, $query);
     }
 
-    public static function getInfo($params){
-        return \Cache::remember(__METHOD__ . json_encode($params), null, function () use ($params) {
-            return AdminRolePermission::querys($params)->first();
-        });
+    public static function getInfo($id, $params, $val = '', $query = '')
+    {
+        if (!$query) $query = AdminRolePermission::query();
+        return BaseRepository::info($id, $params, $val, $query);
     }
 }
