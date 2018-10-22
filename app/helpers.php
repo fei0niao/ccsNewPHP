@@ -2,6 +2,8 @@
 use Lcobucci\JWT\Parser;
 use Illuminate\Support\Facades\DB;
 use App\Http\Model\User;
+use Illuminate\Http\Request;
+
 
 function jsonReturn($data = [], string $message = '', int $code_status = 1)
 {
@@ -14,14 +16,6 @@ function jsonReturn($data = [], string $message = '', int $code_status = 1)
     return response()->json($json);
 }
 
-function modelReturn($data = [], string $message = '', int $code_status = 1)
-{
-    $json['status'] = $code_status ? 1 : 0;
-    $json['data'] = $data;
-    $json['msg'] = $message;
-    return $json;
-}
-
 function failReturn(string $message = '')
 {
     $json['status'] = 0;
@@ -31,6 +25,29 @@ function failReturn(string $message = '')
         $json['debug_sql'] = \DB::getQueryLog();
     }
     return response()->json($json);
+}
+
+function dispatchRoute($route, $data, $returnModel = false, $method = 'POST')
+{
+    $request = request();
+    if ($returnModel) $data += ['returnModel' => true];
+    $request->request->replace($data);
+    $proxy = Request::create(
+        $route,
+        $method
+    );
+    $rs = \Route::dispatch($proxy);
+    $ret = json_decode($rs->getContent(), true);
+    if (!$ret) {
+        echo $rs;
+        exit;
+    }
+    return $ret;
+}
+
+function round2($value)
+{
+    return floor($value*100)/100;
 }
 
 if (!function_exists("parsePassportAuthorization")) {
@@ -54,25 +71,27 @@ if (!function_exists("parsePassportAuthorization")) {
 }
 
 if (!function_exists("getAgent")) {
-    function getAgent(User $user){
-        if($user->agent_id){
+    function getAgent(User $user)
+    {
+        if ($user->agent_id) {
             $agent = \App\Http\Model\Agent::query()
-                ->where("id",$user->agent_id)
-                ->select('name','level','fee_rate','account_left')
+                ->where("id", $user->agent_id)
+                ->select('name', 'level', 'fee_rate', 'account_left')
                 ->first()
                 ->toArray();
             return $agent;
-        }else{
+        } else {
             return [];
         }
     }
 }
 if (!function_exists("makeMerchant")) {
-    function makeMerchant() {
+    function makeMerchant()
+    {
         $str = "";
         $code = "abcdefghijkmnopqrstuvwxyz1234567890";
-        for ($i = 0; $i < 16; $i++){
-            $str.= $code[mt_rand(0,strlen($code)-1)];
+        for ($i = 0; $i < 16; $i++) {
+            $str .= $code[mt_rand(0, strlen($code) - 1)];
         }
         return $str;
     }
@@ -82,19 +101,20 @@ if (!function_exists("makeMerchant")) {
  * 负载均衡用户真实ip
  * @return ip
  * */
-if(!function_exists("getRealIp")){
-    function getRealIp(){
-        if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
-            $ipArr=explode(',',$_SERVER['HTTP_X_FORWARDED_FOR']);
+if (!function_exists("getRealIp")) {
+    function getRealIp()
+    {
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipArr = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
             $ip = $ipArr[0];
             return $ip;
         }
-        if(isset($_SERVER['HTTP_WL_PROXY_CLIENT_IP'])){
+        if (isset($_SERVER['HTTP_WL_PROXY_CLIENT_IP'])) {
             $ip = $_SERVER['HTTP_WL_PROXY_CLIENT_IP'];
             return $ip;
         }
         $ip = request()->ip();
-        return $ip == '::1'?'127.0.0.1':$ip;
+        return $ip == '::1' ? '127.0.0.1' : $ip;
     }
 }
 

@@ -61,19 +61,9 @@ TYO6yiMWh2k4vJ9bLEUNPeQbRemEJ/q1p5uvP0FfeVt1
         if ($validator->fails()) {
             return failReturn($validator->errors()->first());
         }
-        $user = \Auth::user();
-        $agent = $user->agent;
-        if ($params['fee_rate'] > $user->agent->fee_rate) {
-            return failReturn('代理商费率超过其父级！');
-        }
-        $arr = [
-            'parent_id' => $agent->id,
-            'level' => $agent->level + 1,
-            'relation' => $agent->relation . '_' . $agent->id
-        ];
-        $params += $arr;
-        $rs = Agent::createPermission()->create($params);
+        $rs = AdminUser::createPermission()->create($params);
         if (!$rs) return failReturn('创建失败！');
+        if ($request->returnModel) return jsonReturn($rs);
         return jsonReturn([], '创建成功！');
     }
 }

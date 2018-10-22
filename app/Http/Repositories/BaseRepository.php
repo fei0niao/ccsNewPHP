@@ -45,12 +45,18 @@ class BaseRepository
         return static::makeValidator($params, $fieldAble, $rules, $messages);
     }
 
-    public static function makeValidator($params, $fieldAble, $rules, $messages)
+    public static function makeValidator($params, $fieldAble, $rules, $messages, $strict = true)
     {
         $arr = [];
         foreach ($fieldAble as $v) {
-            if (isset($rules[$v])) {
-                $arr[$v] = $rules[$v];
+            if ($strict){
+                if (isset($rules[$v])) {
+                    $arr[$v] = $rules[$v];
+                }
+            }else{
+                if (isset($params[$v]) && isset($rules[$v])) {
+                    $arr[$v] = $rules[$v];
+                }
             }
         }
         $validator = \Validator::make($params, $arr, $messages);

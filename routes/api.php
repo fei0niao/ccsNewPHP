@@ -36,6 +36,10 @@ Route::group([
     Route::post("/agent/create","Agent\AgentController@create");
     Route::post("/agent/agentCreate","Agent\AgentController@agentCreate");
     Route::post("/agent/update/{id}","Agent\AgentController@update");
+
+    Route::post("/agentAccountFlowList","Log\AgentAccountFlowController@lists");
+    Route::post("/agentAccountFlow/create","Log\AgentAccountFlowController@create");
+
     Route::post("/user/create","Admin\AdminUsersController@create");
     Route::post("/customers","Admin\CustomerController@customerList");
     Route::post("/addCustomer",'Admin\CustomerController@createCustomer');
