@@ -32,4 +32,17 @@ class AdminUserRepository extends BaseRepository
         $data['permission'] = AdminPermissionRepository::getList('id',$permission_ids)->pluck('name')->all();
         return $data;
     }
+
+    // strict 严格模式检查所有filedAble 非严格模式只检查params中存在的
+    public static function validates($params, $fieldAble, $strict = true)
+    {
+        $rules = [
+            'username' => 'required|unique:admin_users'
+        ];
+        $messages = [
+            'username.required' => "登录账号错误",
+            'username.unique' => "登录账号已存在"
+        ];
+        return static::makeValidator($params, $fieldAble, $rules, $messages, $strict);
+    }
 }

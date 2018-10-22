@@ -8,6 +8,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Gregwar\Captcha\CaptchaBuilder;
 use Gregwar\Captcha\PhraseBuilder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class Controller extends BaseController
@@ -20,6 +21,19 @@ class Controller extends BaseController
     const CODE_SUCCESS = 1;
     const CODE_FAIL = 0;
     const NOTICE_CHG_PWD = 1;
+
+    protected static $user = '';
+    protected static $userAgent = '';
+
+    static function getUser(){
+        if(!static::$user) static::$user = Auth::user();
+        return static::$user;
+    }
+
+    static function getUserAgent(){
+        if(!static::$userAgent) static::$userAgent = static::getUser()->agent;
+        return static::$userAgent;
+    }
     /**
      * 获取验证码 重新获取验证码
      * @param $captchaId ,$captchaCode
