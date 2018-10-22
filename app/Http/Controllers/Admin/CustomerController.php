@@ -102,6 +102,20 @@ class CustomerController
     }
 
     public function updateInfo(Request $request){
+        $validate = Validator::make($request->all(),[
+            'name' => ['required','unique:customer,name,'.$request->input('id')],
+            'userName' => 'required',
+            'cellphone' => ['required','unique:customer,cellphone,'.$request->input('id')]
+        ],[
+            'name.required' => '用户名不能为空',
+            'name.unique' => '商户名已被占用',
+            'userName.required' => '联系人不能为空',
+            'cellphone.required' => '联系人不能为空',
+            'cellphone.unique' => '该手机号已被商户使用',
+        ]);
+        if($validate->fails()){
+            return failReturn($validate->errors()->first());
+        }
         $id = $request->input('id');
         $Customer = Customer::query()
             ->where('id',$id)
