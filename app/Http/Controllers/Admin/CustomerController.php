@@ -56,10 +56,10 @@ class CustomerController
             return failReturn($validate->errors()->first());
         }
         $agent = Agent::query()->where('id',Auth::user()->agent_id)->first();
-        if($request->input('service_fee') < ($agent->fee_rate)){
+        if($request->input('service_fee') < ($agent->fee_rate * 100)){
             return failReturn('商户费率不能低于自己');
         }
-        $amount = $request->input('cust_capital_amount') * ($agent->fee_rate) / $request->input('service_fee');
+        $amount = $request->input('cust_capital_amount') * ($agent->fee_rate * 100) / $request->input('service_fee');
         $amount = sprintf("%.3f", $amount);
         if($amount > $agent->account_left){
             return failReturn('您的资金不足以支付本次充值！');
@@ -126,7 +126,7 @@ class CustomerController
             return failReturn('商户信息错误');
         }
         $oldFee = $Customer->getOriginal('service_fee');
-        $newFee = $request->input('service_fee');
+        $newFee = $request->input('service_fee') /100;
         $agent = Agent::query()->where('id',Auth::user()->agent_id)->first();
         $selfFee = $agent->fee_rate;
         if($newFee < ($agent->fee_rate)){
@@ -162,7 +162,7 @@ class CustomerController
         if(!$Customer){
             return failReturn('商户信息错误');
         }
-        $oldFee = $Customer->getOriginal('service_fee') * 100;
+        $oldFee = $Customer->getOriginal('service_fee');
         $agent = Agent::query()->where('id',Auth::user()->agent_id)->first();
         $selfFee = $agent->fee_rate;
         $recharge = $request->input('rechargeAmount');
@@ -206,7 +206,7 @@ class CustomerController
     public function flowList(){
         $user = Auth::user();
         try{
-            $list = CustomerRepository::getFlowList($user);
+            $list = CustomerRepository::getOrderList($user);
             return jsonReturn($list);
         }catch (\Exception $exception){
             dd($exception);
