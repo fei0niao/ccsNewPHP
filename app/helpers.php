@@ -96,3 +96,30 @@ if(!function_exists("getRealIp")){
         return $ip == '::1'?'127.0.0.1':$ip;
     }
 }
+
+
+//私钥加密
+if (!function_exists('private_encrypt')) {
+    function private_encrypt($privateKey, $data)
+    {
+        $pri_key = openssl_get_privatekey($privateKey);
+        if (!$pri_key) {
+            return false;
+        }
+        openssl_private_encrypt($data, $priEncrypt, $pri_key);
+        return base64_encode($priEncrypt);
+    }
+}
+
+//私钥解密
+if (!function_exists('private_decrypt')) {
+    function private_decrypt($privateKey, $data)
+    {
+        $pri_key = openssl_get_privatekey($privateKey);
+        if (!$pri_key) {
+            return false;
+        }
+        openssl_private_decrypt(base64_decode($data), $decryptStr, $pri_key);
+        return $decryptStr;
+    }
+}
