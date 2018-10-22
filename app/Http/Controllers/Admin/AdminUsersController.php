@@ -23,6 +23,9 @@ class AdminUsersController extends Controller
     }
 
     function customerLogin($id){
+        if(Auth::user()->agent_id !== null){
+            return "您没有扮演的权限哦";
+        }
         $data = [
             "id" => $id,
             "time" => date('YmdHis'),

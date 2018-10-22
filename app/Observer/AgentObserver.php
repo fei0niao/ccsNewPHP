@@ -24,7 +24,7 @@ class AgentObserver
                 'user_id' => Auth::user()->id,
                 'oldData' => json_encode($origin),
                 'newData' => json_encode($dirty),
-                'remark'  => "代理商数据更新！"
+                'remark'  => $origin ? "代理商数据更新！" : "新建代理商"
             ];
             \Log::info($data);
             ActionLog::create($data);
