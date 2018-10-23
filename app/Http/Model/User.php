@@ -32,7 +32,7 @@ class User extends Authenticatable
 
     public function adminRolePermission()
     {
-        return $this->hasMany(AdminRolePermission::class, 'agent_id', 'id');
+        return $this->hasMany(AdminRolePermission::class, 'agent_id', 'agent_id');
     }
 
     //新加字段
