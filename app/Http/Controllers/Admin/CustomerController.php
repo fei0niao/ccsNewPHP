@@ -83,8 +83,8 @@ class CustomerController
             return jsonReturn([],'新增商户成功');
         }catch (\Exception $exception){
             DB::rollback();
-            return failReturn('未知错误发生！');
             \Log::info($exception);
+            return failReturn('未知错误发生！');
         }
     }
 
@@ -212,6 +212,7 @@ class CustomerController
             $list = CustomerRepository::getOrderList($user);
             return jsonReturn($list);
         }catch (\Exception $exception){
+            \Log::info($exception);
             return failReturn("未知错误发生！请稍后再试！");
         }
     }
