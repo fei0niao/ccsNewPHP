@@ -49,6 +49,7 @@ class CustomerObserver
                 // 代理商流水记录
                 $flowData = [
                     'cust_id' => $id,
+                    'agent_id' => $id = Auth::user()->agent_id,
                     'flow_type' => 2,
                     'amount_of_account' => request()->input('useAmount'),
                     'account_left'    => request()->input('account_left'),
@@ -60,6 +61,7 @@ class CustomerObserver
             if(array_key_exists('service_fee',$dirty) && $origin && request()->has('useAmount')){
                 $flowData = [
                     'cust_id' => $id,
+                    'agent_id' => $id = Auth::user()->agent_id,
                     'flow_type' => 2,
                     'amount_of_account' => request()->input('useAmount'),
                     'account_left'    => request()->input('account_left'),

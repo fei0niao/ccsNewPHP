@@ -143,7 +143,7 @@ class CustomerController
         $newFee = $request->input('service_fee') /100;
         $agent = Agent::query()->where('id',Auth::user()->agent_id)->first();
         $selfFee = $agent->fee_rate;
-        if($newFee < ($agent->fee_rate)){
+        if($newFee *100 < ($agent->fee_rate)){
             return failReturn('商户费率不能低于自己');
         }
         // 费率降低 补扣
