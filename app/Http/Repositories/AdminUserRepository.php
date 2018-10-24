@@ -7,6 +7,7 @@
  */
 
 namespace App\Http\Repositories;
+use App\Http\Model\AdminRolePermission;
 use App\Http\Model\AdminUser;
 use Illuminate\Support\Facades\Hash;
 
@@ -65,9 +66,8 @@ class AdminUserRepository extends BaseRepository
     {
         $data['systemParam'] = SystemSettingRepository::getParamValue();
         $agent = getAgent($user);
-        $data['userInfo'] = collect($user->toArray())->forget(['password', 'id', 'agent_id', 'name'])->all() + $agent;
-        $permission_ids = $user->adminRolePermission->pluck('permission_id')->all();
-        $data['permission'] = AdminPermissionRepository::getList('id',$permission_ids)->pluck('name')->all();
+        $data['userInfo'] = collect($user->toArray())->forget(['password'])->all() + $agent;
+        $data['permission'] = AdminPermissionRepository::getPermissions();
         return $data;
     }
 

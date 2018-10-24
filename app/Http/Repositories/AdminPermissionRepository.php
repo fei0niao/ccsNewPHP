@@ -23,4 +23,19 @@ class AdminPermissionRepository extends BaseRepository
         if (!$query) $query = AdminPermission::query();
         return BaseRepository::info($id, $params, $query);
     }
+
+    public static function getPermissions($user = '')
+    {
+        $user = $user ?: static::getUser();
+        $where = [
+            'where' => [
+                'role_id' => $user->role_id,
+            ],
+            'whereIn' => [
+                'agent_id' => [0, $user->agent_id]
+            ]
+        ];
+        $permission_ids = AdminRolePermissionRepository::getList($where)->pluck('permission_id')->all();
+        return self::getList('id', $permission_ids)->pluck('name')->all();
+    }
 }

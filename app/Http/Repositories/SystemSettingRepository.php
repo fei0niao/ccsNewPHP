@@ -27,8 +27,10 @@ class SystemSettingRepository extends BaseRepository
     public static function getParamValue($param_key = '', $agent_id = '')
     {
         $agent = static::getUserAgent();
-        $paramList = \Cache::tags(__METHOD__)->remember(implode('-', func_get_args()), null, function () use ($agent) {
-            return SystemSetting::where('agent_id', $agent->id)->get()->mapWithKeys(function ($item) {
+        if (!$agent) $agent_id = [0];//超级管理员
+        else $agent_id = [0, $agent->id];
+        $paramList = \Cache::tags(__METHOD__)->remember(implode('-', func_get_args()), null, function () use ($agent_id) {
+            return SystemSetting::whereIn('agent_id', $agent_id)->orderBy('agent_id', 'asc')->get()->mapWithKeys(function ($item) {
                 return [$item['param_key'] => $item['param_value']];
             });
         });
