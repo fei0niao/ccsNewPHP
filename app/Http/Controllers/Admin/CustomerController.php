@@ -56,10 +56,10 @@ class CustomerController
             return failReturn($validate->errors()->first());
         }
         $agent = Agent::query()->where('id',Auth::user()->agent_id)->first();
-        if($request->input('service_fee') < ($agent->fee_rate * 100)){
+        if($request->input('service_fee') < ($agent->fee_rate)){
             return failReturn('商户费率不能低于自己');
         }
-        $amount = $request->input('cust_capital_amount') * ($agent->fee_rate * 100) / $request->input('service_fee');
+        $amount = $request->input('cust_capital_amount') * ($agent->fee_rate) / $request->input('service_fee');
         $amount = sprintf("%.3f", $amount);
         if($amount > $agent->account_left){
             return failReturn('您的资金不足以支付本次充值！');
@@ -149,7 +149,7 @@ class CustomerController
         // 费率降低 补扣
         $cust_capital_amount = $Customer->cust_capital_amount;
         if($newFee < $oldFee && $cust_capital_amount > 0){
-            $amount = $cust_capital_amount * (($selfFee/$newFee)-($selfFee/$oldFee));
+            $amount = $cust_capital_amount * (($selfFee/($newFee*100))-($selfFee/($oldFee*100)));
             $amount = sprintf("%.3f", $amount);
             \Log::info($amount);
             if($amount > $agent->account_left){
@@ -181,7 +181,7 @@ class CustomerController
         $selfFee = $agent->fee_rate;
         $recharge = $request->input('rechargeAmount');
         \Log::info($recharge);
-        $amount = $recharge * ($selfFee/$oldFee);
+        $amount = $recharge * ($selfFee/($oldFee*100));
         $amount = sprintf("%.3f", $amount);
         if($amount > $agent->account_left){
             return failReturn('您的资金不足以支付本次充值！');
