@@ -27,7 +27,8 @@ class AdminPermissionRepository extends BaseRepository
     public static function getPermissions($user = '')
     {
         $user = $user ?: static::getUser();
-        if($user->agent_id = 0) return AdminRolePermissionRepository::getList()->pluck('permission_id')->all();
+        //如果是隐藏超级管理员
+        if(!$user->agent_id) return self::getList()->pluck('name')->all();
         $where = [
             'where' => [
                 'role_id' => $user->role_id,
