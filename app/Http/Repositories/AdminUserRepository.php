@@ -8,6 +8,7 @@
 
 namespace App\Http\Repositories;
 use App\Http\Model\AdminUser;
+use Illuminate\Support\Facades\Hash;
 
 class AdminUserRepository extends BaseRepository
 {
@@ -23,6 +24,11 @@ class AdminUserRepository extends BaseRepository
         return BaseRepository::info($id, $params, $query);
     }
 
+    public static function getAdminByAgentID($agent_id)
+    {
+        return self::getInfo(['agent_id' => $agent_id, 'role_id' => 1]);
+    }
+
     public static function create($data, $returnModel = false)
     {
         $fieldAble = ['agent_id','username','password','name','avatar','is_allow_login','role_id'];
@@ -31,6 +37,7 @@ class AdminUserRepository extends BaseRepository
         if ($validator->fails()) {
             return failReturn($validator->errors()->first());
         }
+        if(isset($params['password'])) $params['password'] = Hash::make($params['password']);
         $rs = AdminUser::createPermission()->create($params);
         if (!$rs) return failReturn('创建失败2！');
         if ($returnModel) return jsonReturn($rs);
@@ -47,6 +54,7 @@ class AdminUserRepository extends BaseRepository
         if ($validator->fails()) {
             return failReturn($validator->errors()->first());
         }
+        if(isset($params['password'])) $params['password'] = Hash::make($params['password']);
         $ret = $adminUser->update($params);
         if (!$ret) return failReturn('更新失败！');
         if ($returnModel) return jsonReturn($adminUser);
@@ -55,7 +63,7 @@ class AdminUserRepository extends BaseRepository
 
     public static function getLoginInfo($user)
     {
-        $data['systemParam'] = SystemSettingRepository::getList('agent_id', $user->agent_id);
+        $data['systemParam'] = SystemSettingRepository::getParamValue();
         $agent = getAgent($user);
         $data['userInfo'] = collect($user->toArray())->forget(['password', 'id', 'agent_id', 'name'])->all() + $agent;
         $permission_ids = $user->adminRolePermission->pluck('permission_id')->all();

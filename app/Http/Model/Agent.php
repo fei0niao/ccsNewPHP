@@ -30,7 +30,7 @@ class Agent extends Base
     }
 
     public function getAccountLeftAttribute($value){
-        return sprintf("%.3f", $value);
+        return sprintf("%.2f", $value);
     }
 
     public function getLevelDefAttribute($val)

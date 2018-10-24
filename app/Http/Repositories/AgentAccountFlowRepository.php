@@ -26,7 +26,7 @@ class AgentAccountFlowRepository extends BaseRepository
 
     public static function create($data, $returnModel = false)
     {
-        $fieldAble = ['agent_id', 'flow_type', 'amount_of_account', 'account_left', 'order_number', 'remark'];
+        $fieldAble = ['agent_id', 'flow_type', 'amount_of_account', 'account_left', 'order_number', 'remark','fee_rate'];
         $params = filterArray($data, $fieldAble);
         $validator = AgentAccountFlowRepository::validates($params, $fieldAble);
         if ($validator->fails()) {

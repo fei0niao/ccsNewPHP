@@ -22,6 +22,14 @@ class AdminUsersController extends Controller
         }
     }
 
+    public function rolePlay($id = '', Request $request)
+    {
+        $user = AdminUser::find($id);
+        $access_token = $user->createToken('rolePlay')->accessToken;
+        return jsonReturn(compact('access_token'));
+    }
+
+
     public function create(Request $request)
     {
         $data =  $request->all();

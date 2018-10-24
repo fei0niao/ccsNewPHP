@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Agent;
 
 use App\Http\Repositories\AdminUserRepository;
+use App\Http\Repositories\SystemSettingRepository;
+use App\Http\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Model\Agent;
@@ -23,6 +25,14 @@ class AgentController extends Controller
         if (!$id) $id = (\Auth::User())->agent_id;
         $rs = AgentRepository::getInfo($id, $request->all());
         return jsonReturn($rs);
+    }
+
+    public function rolePlay($id = '', Request $request)
+    {
+        $user = UserRepository::getAdminByAgentID($id);
+        $access_token = $user->createToken('rolePlay')->accessToken;
+        $admin_url = SystemSettingRepository::getParamValue('admin_url');
+        return jsonReturn(compact('access_token','admin_url'));
     }
 
     public static function agentCreate(Request $request)
@@ -68,7 +78,7 @@ class AgentController extends Controller
             $ret = AgentRepository::update($id, $agent);
             if (!$ret['status']) return $ret;
             //获取管理员信息
-            $adminUser = AdminUserRepository::getInfo(['agent_id' => $id, 'role_id' => 1]);
+            $adminUser = AdminUserRepository::getAdminByAgentID($id);
             $ret = AdminUserRepository::update($adminUser->id, $user);
             if (!$ret['status']) return $ret;
             DB::commit();

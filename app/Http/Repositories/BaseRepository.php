@@ -20,7 +20,7 @@ class BaseRepository
 
     static function getUserAgent()
     {
-        return Common::getUser();
+        return Common::getUserAgent();
     }
 
     /**

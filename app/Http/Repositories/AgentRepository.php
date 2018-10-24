@@ -122,7 +122,8 @@ class AgentRepository extends BaseRepository
             'flow_type' => 1,
             'amount_of_account' => $amount_of_account,
             'account_left' => $account_left,
-            'remark' => '创建代理商时的充值'
+            'remark' => '创建代理商时的充值',
+            'fee_rate' => $agent->fee_rate
         ];
         $ret = AgentAccountFlowRepository::create($arr);
         if (!$ret['status']) return $ret;
@@ -154,7 +155,8 @@ class AgentRepository extends BaseRepository
                 'flow_type' => 2,
                 'amount_of_account' => $amount_of_account_parent,
                 'account_left' => $account_left_parent,
-                'remark' => $remark
+                'remark' => $remark,
+                'fee_rate' => $parentAgent->fee_rate
             ];
             $ret = AgentAccountFlowRepository::create($arr);
             if (!$ret['status']) return $ret;
