@@ -13,7 +13,7 @@ use App\Http\Model\AdminRolePermission;
 
 class AdminRolePermissionRepository extends BaseRepository
 {
-    public static function getList($params, $val = '', $query = '')
+    public static function getList($params = [], $val = '', $query = '')
     {
         if (!$query) $query = AdminRolePermission::query();
         return BaseRepository::lists($params, $val, $query);

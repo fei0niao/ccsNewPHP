@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AgentRepository extends BaseRepository
 {
-    public static function getList($params, $val = '', $query = '')
+    public static function getList($params = [], $val = '', $query = '')
     {
         if (!$query) $query = Agent::query();
         return BaseRepository::lists($params, $val, $query);

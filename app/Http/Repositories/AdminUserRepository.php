@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminUserRepository extends BaseRepository
 {
-    public static function getList($params, $val = '', $query = '')
+    public static function getList($params = [], $val = '', $query = '')
     {
         if (!$query) $query = AdminUser::query();
         return BaseRepository::lists($params, $val, $query);
