@@ -220,7 +220,7 @@ class CustomerController
     public function flowList(){
         $user = Auth::user();
         try{
-            $list = CustomerRepository::getOrderList($user);
+            $list = CustomerRepository::getFlowList($user);
             return jsonReturn($list);
         }catch (\Exception $exception){
             dd($exception);
