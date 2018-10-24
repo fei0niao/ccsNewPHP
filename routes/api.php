@@ -49,5 +49,5 @@ Route::group([
     Route::post("/CustomerRecharge","Admin\CustomerController@recharge");
     Route::post("/orderList","Admin\CustomerController@orderList");
     Route::post("/customerFlowList","Admin\CustomerController@flowList");
-    Route::get("/customerLogin/{id}","Admin\AdminUsersController@customerLogin");
+    Route::post("/customerLogin/{id}","Admin\CustomerController@customerLogin");
 });
