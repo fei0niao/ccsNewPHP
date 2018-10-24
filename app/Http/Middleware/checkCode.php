@@ -22,7 +22,7 @@ class checkCode
         $captchaId = $request->input('captchaId');
         $captchaCode = $request->input('captchaCode');
         if(!$captchaId || !$captchaCode || !Controller::verifyCaptchaCode($captchaId,$captchaCode)) {
-            return Controller::jsonReturn([], Controller::CODE_FAIL, '图像验证码错误');
+            return response()->json(['msg' => '图像验证码错误', 'status' => 0]);
         }
         return $next($request);
     }
