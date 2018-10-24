@@ -18,9 +18,22 @@ class AgentAccountFlowRepository extends BaseRepository
         return BaseRepository::lists($params, $val, $query);
     }
 
-    public static function getInfo($id, $params, $val = '', $query = '')
+    public static function getInfo($id, $params = '', $query = '')
     {
         if (!$query) $query = AgentAccountFlow::query();
-        return BaseRepository::info($id, $params, $val, $query);
+        return BaseRepository::info($id, $params, $query);
+    }
+
+    public static function create($data, $returnModel = false)
+    {
+        $fieldAble = ['agent_id', 'flow_type', 'amount_of_account', 'account_left', 'order_number', 'remark'];
+        $params = filterArray($data, $fieldAble);
+        $validator = AgentAccountFlowRepository::validates($params, $fieldAble);
+        if ($validator->fails()) {
+            return failReturn($validator->errors()->first());
+        }
+        $rs = AgentAccountFlow::createPermission()->create($params);
+        if ($returnModel) return jsonReturn($rs);
+        return jsonReturn([], '创建成功！');
     }
 }

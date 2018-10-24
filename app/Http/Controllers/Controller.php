@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -22,18 +23,14 @@ class Controller extends BaseController
     const CODE_FAIL = 0;
     const NOTICE_CHG_PWD = 1;
 
-    protected static $user = '';
-    protected static $userAgent = '';
-
     static function getUser(){
-        if(!static::$user) static::$user = Auth::user();
-        return static::$user;
+        return Common::getUser();
     }
 
     static function getUserAgent(){
-        if(!static::$userAgent) static::$userAgent = static::getUser()->agent;
-        return static::$userAgent;
+        return Common::getUser();
     }
+
     /**
      * 获取验证码 重新获取验证码
      * @param $captchaId ,$captchaCode

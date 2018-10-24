@@ -25,14 +25,7 @@ class AgentAccountFlowController extends Controller
 
     public function create(Request $request)
     {
-        $fieldAble = ['agent_id', 'flow_type', 'amount_of_account', 'account_left', 'order_number', 'remark'];
-        $params = $request->only($fieldAble);
-        $validator = AgentAccountFlowRepository::validates($params, $fieldAble);
-        if ($validator->fails()) {
-            return failReturn($validator->errors()->first());
-        }
-        $rs = AgentAccountFlow::createPermission()->create($params);
-        if ($request->returnModel) return jsonReturn($rs);
-        return jsonReturn([], '创建成功！');
+        $data =  $request->all();
+        return AgentAccountFlowRepository::create($data);
     }
 }

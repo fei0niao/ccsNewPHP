@@ -33,9 +33,10 @@ Route::group([
     Route::post("/updatePwd","Login\LoginController@updatePwd");
     Route::post("/agentList","Agent\AgentController@lists");
     Route::post("/agentInfo/{id?}","Agent\AgentController@info");
-    Route::post("/agent/create","Agent\AgentController@create");
     Route::post("/agent/agentCreate","Agent\AgentController@agentCreate");
-    Route::post("/agent/update/{id}","Agent\AgentController@update");
+    Route::post("/agent/infoUpdate/{id}","Agent\AgentController@infoUpdate");
+    Route::post("/agent/feeRateUpdate/{id}","Agent\AgentController@feeRateUpdate");
+    Route::post("/agent/accountUpdate/{id}","Agent\AgentController@accountUpdate");
 
     Route::post("/agentAccountFlowList","Log\AgentAccountFlowController@lists");
     Route::post("/agentAccountFlow/create","Log\AgentAccountFlowController@create");

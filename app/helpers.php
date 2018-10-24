@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Model\User;
 use Illuminate\Http\Request;
 
-
 function jsonReturn($data = [], string $message = '', int $code_status = 1)
 {
     $json['status'] = $code_status ? 1 : 0;
@@ -13,7 +12,8 @@ function jsonReturn($data = [], string $message = '', int $code_status = 1)
     if (config('app.debug')) {
         $json['debug_sql'] = \DB::getQueryLog();
     }
-    return response()->json($json);
+    return $json;
+    //return response()->json($json);
 }
 
 function failReturn(string $message = '')
@@ -24,7 +24,8 @@ function failReturn(string $message = '')
     if (config('app.debug')) {
         $json['debug_sql'] = \DB::getQueryLog();
     }
-    return response()->json($json);
+    return $json;
+    //return response()->json($json);
 }
 
 function dispatchRoute($route, $data, $returnModel = false, $method = 'POST')
@@ -47,7 +48,18 @@ function dispatchRoute($route, $data, $returnModel = false, $method = 'POST')
 
 function round2($value)
 {
-    return floor($value*100)/100;
+    return floor($value * 100) / 100;
+}
+
+function filterArray($params, $fieldAble)
+{
+    $arr = [];
+    foreach ($params as $key => $v) {
+        if (array_search($key, $fieldAble)!==false) {
+            $arr[$key] = $v;
+        }
+    }
+    return $arr;
 }
 
 if (!function_exists("parsePassportAuthorization")) {

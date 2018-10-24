@@ -2,6 +2,7 @@
 
 namespace App\Http\Model;
 
+use App\Common;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Relations;
@@ -14,7 +15,6 @@ use Closure;
  */
 class Base extends Model
 {
-    public static $user = '';
     public static $modelName = '';
     protected $guarded = [];//没有此属性不能批量赋值
 
@@ -28,7 +28,6 @@ class Base extends Model
     public static $_fields = [];//特殊情况:既属于sql字段 又依赖其它字段
     const BASE_PARAMS = ['field', 'where', 'orWhere', 'search', 'whereIn', 'whereBetween', 'whereNull', 'has', 'count', 'order', 'offset', 'limit', 'keyword', 'extra'];
 
-
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
@@ -38,6 +37,14 @@ class Base extends Model
         if (!empty(static::$_appends[$modelName])) $this->appends = array_merge($this->appends, static::$_appends[$modelName]);
         if (!empty(static::$_hiddens[$modelName])) $this->hidden = array_merge($this->hidden, static::$_hiddens[$modelName]);
         if (!empty(static::$_visibles[$modelName])) $this->visible = array_merge($this->visible, static::$_visibles[$modelName]);
+    }
+
+    static function getUser(){
+        return Common::getUser();
+    }
+
+    static function getUserAgent(){
+        return Common::getUser();
     }
 
     public static function assignAppends($val)
@@ -112,7 +119,8 @@ class Base extends Model
     //权限控制 调用方式 模型名::permission()
     public function scopePermission($query)
     {
-        $id = (static::$user)->id;
+        return $query;
+        /*$id = (static::$user)->id;
         $role_id = (static::$user)->role_id;
         $agent_id = (static::$user)->agent_id;
         if (in_array($role_id, [1, 2, 3, 4, 5, 6, 7, 8, 9])) {
@@ -124,7 +132,7 @@ class Base extends Model
             $agent_ids = Agent::getAllChildrenAgentsByAgentID($agent_id);
             return $query->whereIn("agent_id", $agent_ids);
         }
-        return abort(403, '未授权！');
+        return abort(403, '未授权！');*/
     }
 
     //更新数据的权限控制

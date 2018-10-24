@@ -56,6 +56,6 @@ class Agent extends Base
     }
 
     public function user(){
-        return $this->hasOne(User::class, 'agent_id', 'id');
+        return $this->hasOne(AdminUser::class, 'agent_id', 'id');
     }
 }

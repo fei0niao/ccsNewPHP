@@ -24,15 +24,7 @@ class AdminUsersController extends Controller
 
     public function create(Request $request)
     {
-        $fieldAble = ['agent_id','username','password','name','avatar','is_allow_login','role_id'];
-        $params = $request->only($fieldAble);
-        $validator = AdminUserRepository::validates($params, $fieldAble);
-        if ($validator->fails()) {
-            return failReturn($validator->errors()->first());
-        }
-        $rs = AdminUser::createPermission()->create($params);
-        if (!$rs) return failReturn('创建失败！');
-        if ($request->returnModel) return jsonReturn($rs);
-        return jsonReturn([], '创建成功！');
+        $data =  $request->all();
+        return AdminUserRepository::create($data);
     }
 }

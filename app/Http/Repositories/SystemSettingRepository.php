@@ -18,9 +18,9 @@ class SystemSettingRepository extends BaseRepository
         return BaseRepository::lists($params, $val, $query);
     }
 
-    public static function getInfo($id, $params, $val = '', $query = '')
+    public static function getInfo($id, $params = '', $query = '')
     {
         if (!$query) $query = SystemSetting::query();
-        return BaseRepository::info($id, $params, $val, $query);
+        return BaseRepository::info($id, $params, $query);
     }
 }
