@@ -12,7 +12,7 @@ use App\Http\Model\SystemSetting;
 
 class SystemSettingRepository extends BaseRepository
 {
-    public static function getList($params, $val = '', $query = '')
+    public static function getList($params = [], $val = '', $query = '')
     {
         if (!$query) $query = SystemSetting::query();
         return BaseRepository::lists($params, $val, $query);

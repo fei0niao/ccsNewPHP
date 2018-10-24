@@ -12,7 +12,7 @@ use App\Http\Model\AgentAccountFlow;
 
 class AgentAccountFlowRepository extends BaseRepository
 {
-    public static function getList($params, $val = '', $query = '')
+    public static function getList($params = [], $val = '', $query = '')
     {
         if (!$query) $query = AgentAccountFlow::query();
         return BaseRepository::lists($params, $val, $query);
