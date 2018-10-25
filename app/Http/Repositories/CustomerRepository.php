@@ -13,6 +13,7 @@ use App\Http\Model\Agent;
 use App\Http\Model\CustAccountFlow;
 use App\Http\Model\Customer;
 use App\Http\Model\Order;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerRepository
 {
@@ -35,7 +36,7 @@ class CustomerRepository
             $list = $list->where('id',$requset['search']['id']);
         }
         if($agents){
-            $list = $list->where('agent_id','in',$agents);
+            $list = $list->whereIn('agent_id',$agents);
         }
         $list=$list->orderBy('id',"DESC")
             ->with(['Agent' => function($query){
@@ -94,7 +95,7 @@ class CustomerRepository
             $list = $list->where('status',$request['search']['status']);
         }
         if($agents){
-            $list = $list->where('merchant_id','in',$agents);
+            $list = $list->whereIn('merchant_id',$agents);
         }
         $list=$list->orderBy('id',"DESC");
         // 有offset 认为为导出
@@ -143,7 +144,7 @@ class CustomerRepository
         }
         if($agents){
             $list = $list->whereHas('customer', function($query)use($agents){
-                $query->where('agent_id','in',$agents);
+                $query->whereIn('agent_id',$agents);
             });
         }
         $list = $list->with(['order' => function($query){
@@ -171,12 +172,13 @@ class CustomerRepository
         if($agentId == "" || $agentId == 1){
             return [];
         }else{
-            $selfAgent = Agent::query()->find($agentId)->get();
+            $selfAgent = Agent::query()->where('id',$agentId)->first();
             $agents = Agent::query()
-                ->where("relation",'like',$selfAgent->getSelfRelationAttribute())
-                ->get($col)
+                ->where("relation",'like',$selfAgent->relation . $agentId .'%')
+                ->orWhere('id',$agentId)
+                ->get([$col])
                 ->toArray();
-            return $agents;
+            return array_dot($agents);
         }
     }
     static private function excelData($list,$limit){
