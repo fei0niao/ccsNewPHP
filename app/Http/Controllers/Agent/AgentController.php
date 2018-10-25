@@ -38,6 +38,7 @@ class AgentController extends Controller
     public static function agentCreate(Request $request)
     {
         $userAgent = static::getUserAgent();
+        if ($userAgent && $userAgent->level > 3) return failReturn('您的级别无法创建下级代理商！');
         $user = $request->user;
         $agent = $request->agent;
         if (!$user && !$agent) return failReturn('请求参数错误！');
