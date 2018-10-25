@@ -14,13 +14,13 @@ class AgentAccountFlowRepository extends BaseRepository
 {
     public static function getList($params = [], $val = '', $query = '')
     {
-        if (!$query) $query = AgentAccountFlow::query();
+        if (!$query) $query = AgentAccountFlow::query()->permission();
         return BaseRepository::lists($params, $val, $query);
     }
 
     public static function getInfo($id, $params = '', $query = '')
     {
-        if (!$query) $query = AgentAccountFlow::query();
+        if (!$query) $query = AgentAccountFlow::query()->permission();
         return BaseRepository::info($id, $params, $query);
     }
 

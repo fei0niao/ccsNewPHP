@@ -11,6 +11,17 @@ class Agent extends Base
     public static $append_fields = [
     ];
 
+    //权限控制 调用方式 模型名::permission()
+    public function scopePermission($query)
+    {
+        $user = static::getUser();
+        $agent = static::getUserAgent();
+        if (!$agent_id = $user->agent_id) return $query;
+        return $query->where(function ($query) use ($agent) {
+            return $query->where('relation', 'like', $agent->relation . $agent->id . '_%')->orwhere('id', $agent->id);
+        });
+    }
+
     public function getStatusDefAttribute($val)
     {
         switch ($this->attributes['status']) {
