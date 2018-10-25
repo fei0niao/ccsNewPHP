@@ -98,7 +98,7 @@ class AgentRepository extends BaseRepository
         $rules = [
             'name' => $id ? 'required|unique:agent,name,' . $id : 'required|unique:agent',
             "contact_phone" => ["required", "regex:/^1[0-9]{10}$/"],
-            'fee_rate' => 'required|numeric|between:0,1',
+            'fee_rate' => 'required|numeric|between:0.0015,0.06',
             'remark' => 'alpha_dash|max:200',
             'account_left' => ["required", "regex:/(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/"],
         ];
