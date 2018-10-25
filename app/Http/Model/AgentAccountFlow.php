@@ -32,6 +32,11 @@ class AgentAccountFlow extends Base
         return $this->belongsTo(Agent::class, 'agent_id', 'id');
     }
 
+    public function getFeeRateDefAttribute()
+    {
+        return $this->attributes['fee_rate'] * 100 . '%';
+    }
+
     public function getFlowTypeDefAttribute($val){
         switch ($this->attributes['flow_type']) {
             case 1:

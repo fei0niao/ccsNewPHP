@@ -36,13 +36,21 @@ class Agent extends Base
         }
     }
 
-    public function getSelfRelationAttribute(){
+    public function getSelfRelationAttribute()
+    {
         return $this->relation . $this->id . '%';
     }
 
-    public function getAccountLeftAttribute($value){
+    public function getAccountLeftAttribute($value)
+    {
         return sprintf("%.2f", $value);
     }
+
+    public function getFeeRateDefAttribute()
+    {
+        return $this->attributes['fee_rate'] * 100 . '%';
+    }
+
 
     public function getLevelDefAttribute($val)
     {
@@ -62,11 +70,13 @@ class Agent extends Base
         }
     }
 
-    public function agent(){
+    public function agent()
+    {
         return $this->belongsTo(self::class, 'parent_id', 'id');
     }
 
-    public function user(){
+    public function user()
+    {
         return $this->hasOne(AdminUser::class, 'agent_id', 'id');
     }
 }
