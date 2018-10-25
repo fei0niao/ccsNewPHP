@@ -11,6 +11,17 @@ class Agent extends Base
     public static $append_fields = [
     ];
 
+    //权限控制 调用方式 模型名::permission()
+    public function scopePermission($query)
+    {
+        $user = static::getUser();
+        $agent = static::getUserAgent();
+        if (!$agent_id = $user->agent_id) return $query;
+        return $query->where(function ($query) use ($agent) {
+            return $query->where('relation', 'like', $agent->relation . $agent->id . '_%')->orwhere('id', $agent->id);
+        });
+    }
+
     public function getStatusDefAttribute($val)
     {
         switch ($this->attributes['status']) {
@@ -25,13 +36,21 @@ class Agent extends Base
         }
     }
 
-    public function getSelfRelationAttribute(){
+    public function getSelfRelationAttribute()
+    {
         return $this->relation . $this->id . '%';
     }
 
-    public function getAccountLeftAttribute($value){
+    public function getAccountLeftAttribute($value)
+    {
         return sprintf("%.2f", $value);
     }
+
+    public function getFeeRateDefAttribute()
+    {
+        return $this->attributes['fee_rate'] * 100 . '%';
+    }
+
 
     public function getLevelDefAttribute($val)
     {
@@ -51,11 +70,13 @@ class Agent extends Base
         }
     }
 
-    public function agent(){
+    public function agent()
+    {
         return $this->belongsTo(self::class, 'parent_id', 'id');
     }
 
-    public function user(){
+    public function user()
+    {
         return $this->hasOne(AdminUser::class, 'agent_id', 'id');
     }
 }

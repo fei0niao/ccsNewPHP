@@ -14,13 +14,13 @@ class SystemSettingRepository extends BaseRepository
 {
     public static function getList($params = [], $val = '', $query = '')
     {
-        if (!$query) $query = SystemSetting::query();
+        if (!$query) $query = SystemSetting::query()->permission();
         return BaseRepository::lists($params, $val, $query);
     }
 
     public static function getInfo($id, $params = '', $query = '')
     {
-        if (!$query) $query = SystemSetting::query();
+        if (!$query) $query = SystemSetting::query()->permission();
         return BaseRepository::info($id, $params, $query);
     }
 

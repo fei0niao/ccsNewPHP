@@ -38,19 +38,26 @@ class AgentController extends Controller
     public static function agentCreate(Request $request)
     {
         $userAgent = static::getUserAgent();
+        if ($userAgent && $userAgent->level > 3) return failReturn('您的级别无法创建下级代理商！');
         $user = $request->user;
         $agent = $request->agent;
         if (!$user && !$agent) return failReturn('请求参数错误！');
         DB::beginTransaction();
         try {
             $arr = [
-                'parent_id' => $userAgent->id,
-                'level' => $userAgent->level + 1,
-                'relation' => $userAgent->relation . '_' . $userAgent->id
+                'parent_id' => $userAgent ? $userAgent->id : null,
+                'level' => $userAgent ? $userAgent->level + 1 : 1,
+                'relation' => $userAgent ? $userAgent->relation . $userAgent->id . '_' : ''
             ];
             $ret = AgentRepository::create($agent + $arr, true);
             if (!$ret['status']) return $ret;
             $agent = $ret['data'];
+            if ($agent->level > 1 && $request->agent['account_left']) {
+                $parentAgent = AgentRepository::getParentAgent($agent);
+                $account_left_ = -round2($request->agent['account_left'] * ($parentAgent->fee_rate / $agent->fee_rate));
+                $ret = AgentRepository::update($parentAgent->id, compact('account_left_'), false, ['flow_type' => 2, 'remark' => '给代理商' . $agent->id . '充值']);
+                if (!$ret['status']) return $ret;
+            }
             /*---------------------------------------------*/
             $arr = [
                 'role_id' => 1,
@@ -103,7 +110,7 @@ class AgentController extends Controller
             $parentAgent = AgentRepository::getParentAgent($agent);
             if ($ret['data']['new']->fee_rate < $ret['data']['orig']->fee_rate) {
                 $account_left_ = -round2($agent->account_left * $parentAgent->fee_rate * (1 / $ret['data']['new']->fee_rate - 1 / $ret['data']['orig']->fee_rate));
-                $ret = AgentRepository::update($parentAgent->id, compact('account_left_'),false,['flow_type' => 2, 'remark' => '给代理商' . $agent->id . '调整费率']);
+                $ret = AgentRepository::update($parentAgent->id, compact('account_left_'), false, ['flow_type' => 2, 'remark' => '给代理商' . $agent->id . '调整费率']);
                 if (!$ret['status']) return $ret;
             }
             DB::commit();
@@ -120,13 +127,16 @@ class AgentController extends Controller
         $params = $request->only('account_left_');
         DB::beginTransaction();
         try {
-            $ret = AgentRepository::update($id, $params,true,['flow_type' => 1, 'remark' => '代理商充值']);
+            $remark = static::getUser()->agent_id > 0 ? '代理商充值' : '平台充值';
+            $ret = AgentRepository::update($id, $params, true, ['flow_type' => 1, 'remark' => $remark]);
             if (!$ret['status']) return $ret;
             $agent = $ret['data']['new'];
-            $parentAgent = AgentRepository::getParentAgent($agent);
-            $account_left_ = -round2($params['account_left_'] * ($parentAgent->fee_rate / $agent->fee_rate));
-            $ret = AgentRepository::update($parentAgent->id, compact('account_left_'), false, ['flow_type' => 2, 'remark' => '给代理商' . $agent->id . '充值']);
-            if (!$ret['status']) return $ret;
+            if ($agent->level > 1) {
+                $parentAgent = AgentRepository::getParentAgent($agent);
+                $account_left_ = -round2($params['account_left_'] * ($parentAgent->fee_rate / $agent->fee_rate));
+                $ret = AgentRepository::update($parentAgent->id, compact('account_left_'), false, ['flow_type' => 2, 'remark' => '给代理商' . $agent->id . '充值']);
+                if (!$ret['status']) return $ret;
+            }
             DB::commit();
             return jsonReturn([], '充值成功！');
         } catch (\Exception $e) {

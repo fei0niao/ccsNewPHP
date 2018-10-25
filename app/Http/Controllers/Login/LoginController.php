@@ -33,6 +33,8 @@ class LoginController extends Controller
         if (!$user->is_allow_login) {
             return failReturn("账号已被禁用，请联系客服人员！");
         }
+        $agent = $user->agent;
+        if($agent && !$agent->is_allow_login) return failReturn("代理商已被禁用，请联系客服人员！");
         $ret = self::getAuthToken($username, $password);
         if(!$ret) return failReturn("用户账号或密码错误!");
         return jsonReturn($ret);

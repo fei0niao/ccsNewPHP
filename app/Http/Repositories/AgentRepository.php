@@ -15,13 +15,13 @@ class AgentRepository extends BaseRepository
 {
     public static function getList($params = [], $val = '', $query = '')
     {
-        if (!$query) $query = Agent::query();
+        if (!$query) $query = Agent::query()->permission();
         return BaseRepository::lists($params, $val, $query);
     }
 
     public static function getInfo($id, $params = '', $query = '')
     {
-        if (!$query) $query = Agent::query();
+        if (!$query) $query = Agent::query()->permission();
         return BaseRepository::info($id, $params, $query);
     }
 
@@ -33,7 +33,8 @@ class AgentRepository extends BaseRepository
         if ($validator->fails()) {
             return failReturn($validator->errors()->first());
         }
-        if ($params['fee_rate'] < static::getUserAgent()->fee_rate) {
+        $agent = static::getUserAgent();
+        if ($params['fee_rate'] < ($agent ? $agent->fee_rate : 0)) {
             return failReturn('代理商费率不能小于其父级！');
         }
         $rs = Agent::createPermission()->create($params);
@@ -57,7 +58,7 @@ class AgentRepository extends BaseRepository
 
     public static function update($id, $data, $returnModel = false, $flow = [])
     {
-        $fieldAble = ['name', 'contact_person', 'contact_phone', 'fee_rate', 'remark', 'account_left', 'account_left_','is_allow_login'];
+        $fieldAble = ['name', 'contact_person', 'contact_phone', 'fee_rate', 'remark', 'account_left', 'account_left_', 'is_allow_login'];
         $params = filterArray($data, $fieldAble);
         $agent = Agent::updatePermission()->find($id);
         $origAgent = clone $agent;
@@ -71,7 +72,7 @@ class AgentRepository extends BaseRepository
             return failReturn($validator->errors()->first());
         }
         if (isset($params['fee_rate'])) {
-            $checkFeeRate = AgentRepository::checkFeeRate($agent);
+            $checkFeeRate = AgentRepository::checkFeeRate($agent, $params['fee_rate']);
             if ($checkFeeRate) return failReturn('代理商费率超过其父级或低于其子级,请重新调整！');
         }
         $ret = $agent->update($params);
@@ -108,17 +109,17 @@ class AgentRepository extends BaseRepository
             "contact_phone.regex" => "请填写正确的手机号码",
             'fee_rate.*' => '费率填写错误',
             'remark.*' => "备注填写错误",
-            'account_left.*' => "充值金额错误"
+            'account_left.*' => "余额不足"
         ];
         return static::makeValidator($params, $fieldAble, $rules, $messages, $strict);
     }
 
-    public static function checkFeeRate(Agent $agent)
+    public static function checkFeeRate(Agent $agent, $fee_rate)
     {
-        return Agent::where(function ($query) use ($agent) {
-            return $query->where('id', $agent->parent_id)->where('fee_rate', '>', $agent->fee_rate);
-        })->orWhere(function ($query) use ($agent) {
-            return $query->where('parent_id', $agent->id)->where('fee_rate', '<', $agent->fee_rate);
+        return Agent::where(function ($query) use ($agent, $fee_rate) {
+            return $query->where('id', $agent->parent_id)->where('fee_rate', '>', $fee_rate);
+        })->orWhere(function ($query) use ($agent, $fee_rate) {
+            return $query->where('parent_id', $agent->id)->where('fee_rate', '<', $fee_rate);
         })->first();
     }
 
@@ -126,5 +127,14 @@ class AgentRepository extends BaseRepository
     {
         //todo 加缓存
         return Agent::find($agent->parent_id);
+    }
+
+    //获取所有下级代理商 包括自己
+    public static function getChildAgent($agent = '', $self = true)
+    {
+        if (!$agent) $agent = static::getUserAgent();
+        $ids = Agent::where('relation', 'like', $agent->relation . $agent->id . '_%')->pluck('id')->all();
+        if ($self) $ids[] = $agent->id;
+        return $ids;
     }
 }
