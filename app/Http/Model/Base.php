@@ -39,11 +39,13 @@ class Base extends Model
         if (!empty(static::$_visibles[$modelName])) $this->visible = array_merge($this->visible, static::$_visibles[$modelName]);
     }
 
-    static function getUser(){
+    static function getUser()
+    {
         return Common::getUser();
     }
 
-    static function getUserAgent(){
+    static function getUserAgent()
+    {
         return Common::getUserAgent();
     }
 
@@ -65,6 +67,7 @@ class Base extends Model
         return static::$_visibles[static::$modelName] = array_merge(static::$_visibles[static::$modelName]??[], $val);
     }
 
+    //todo 以后用范围查询 addselects代替
     public static function assignSelects($val)
     {
         $val = is_array($val) ? $val : func_get_args();
@@ -72,29 +75,21 @@ class Base extends Model
         return static::$_selects[static::$modelName] = array_unique(array_merge(static::$_selects[static::$modelName]??[], $val));
     }
 
-    //query()链式调用 改进select方法 可以任意选择显示需要的字段（数据库字段+模型中附加字段）
-    public function scopeSelects($query, $val)
+    //query()链式调用 改进select方法 可以任意选择显示需要的字段（数据库字段+模型中附加字段）$val为数组
+    public function scopeSelects($query, ...$val)
     {
+        if (is_array($val[0])) $val = $val[0]; // 如果第一个参数是数组 证明传的就是数组
         //很关键 必须找到调用的model 否则static::$append_fields始终指向第一次调用的model
         $model = $query->getModel();
         static::$modelName = get_class($model);
         static::$append_fields = $model::$append_fields;
         static::$_fields = $model::$_fields;
-        $noNeedSelect = in_array('*', $val);
         static::$_appends = static::$_hiddens = static::$_visibles = [];//初始化 否则自己关联自己（父子)的场景会报错
-        if (!$noNeedSelect && !static::$append_fields && !static::$_fields) return $query->select($val);
-        //参数变成数组
-        if (!is_array($val)) {
-            $val = func_get_args();
-            array_shift($val);//第一个参数为$query去掉
-        }
-        if ($noNeedSelect) {
-            foreach ($val as $k => $v) {
-                if ($v == '*' || strpos($v, ' as ')) continue;
-                static::assignAppends($v);
-                unset($val[$k]);
-            }
-            return $query->select(array_values($val));
+        $num = array_search('*', $val);
+        if ($num !== false) {
+            array_splice($val, $num, 1);
+            static::assignAppends($val);
+            return $query->select('*');
         }
         foreach ($val as $v) {
             //若字段判断为附加字段 则放到appends属性里
