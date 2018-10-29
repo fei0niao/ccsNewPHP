@@ -26,7 +26,7 @@ class CustomerController
             $list = CustomerRepository::getCustomerList($user);
             return jsonReturn($list);
         }catch (\Exception $exception){
-            dd($exception);
+            \Log::info($exception);
             return failReturn("未知错误发生！请稍后再试！");
         }
     }
@@ -223,7 +223,7 @@ class CustomerController
             $list = CustomerRepository::getFlowList($user);
             return jsonReturn($list);
         }catch (\Exception $exception){
-            dd($exception);
+            \Log::info($exception);
             return failReturn("未知错误发生！请稍后再试！");
         }
     }

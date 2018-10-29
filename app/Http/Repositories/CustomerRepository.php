@@ -23,16 +23,16 @@ class CustomerRepository
         $requset = request()->all();
         $agents = self::getAgents($agentId, 'id');
         $list = Customer::query();
-        if($requset['search']['canLogin'] !== null){
+        if(isset($requset['search']['canLogin']) && $requset['search']['canLogin'] !== null){
             $list = $list->where('is_login_forbidden',$requset['search']['canLogin']);
         }
-        if($requset['search']['useStatus'] !== null){
+        if(isset($requset['search']['useStatus']) && $requset['search']['useStatus'] !== null){
             $list = $list->where('status',$requset['search']['useStatus']);
         }
-        if($requset['search']['name']){
+        if(isset($requset['search']['name']) && $requset['search']['name']){
             $list = $list->where('name','like','%'.$requset['search']['name'].'%');
         }
-        if($requset['search']['id']){
+        if(isset($requset['search']['id']) && $requset['search']['id']){
             $list = $list->where('id',$requset['search']['id']);
         }
         if($agents){
@@ -70,13 +70,13 @@ class CustomerRepository
         $agentId = $user->agent_id;
         $agents = self::getAgents($agentId, 'merchant_id');
         $list = Order::query();
-        if($request['search']['id']){
+        if(isset($requset['search']['id']) && $request['search']['id']){
             $id = $request['search']['id'];
             $list = $list->whereHas('customer', function($query)use($id){
                 $query->where('id',$id);
             });
         }
-        if($request['search']['name']){
+        if(isset($requset['search']['name']) && $request['search']['name']){
             $name =$request['search']['name'];
             $list = $list->whereHas('customer', function($query)use($name){
                 $query->where('name',$name);
@@ -85,13 +85,13 @@ class CustomerRepository
         $list = $list->with(['customer' => function($query){
             $query->select("merchant_id",'name','id');
         }]);
-        if($request['search']['orderNum']){
+        if(isset($requset['search']['orderNum']) && $request['search']['orderNum']){
             $orderNum = $request['search']['orderNum'];
             $list = $list->where(function($query)use($orderNum){
                 return $query->where("trade_order_id",$orderNum)->orWhere("order_number",$orderNum);
             });
         }
-        if($request['search']['status'] !== null){
+        if(isset($requset['search']['status']) && $request['search']['status'] !== null){
             $list = $list->where('status',$request['search']['status']);
         }
         if($agents){
@@ -120,13 +120,13 @@ class CustomerRepository
         $agentId = $user->agent_id;
         $agents = self::getAgents($agentId, 'id');
         $list = CustAccountFlow::query();
-        if($request['search']['id']){
+        if(isset($requset['search']['id']) && $request['search']['id']){
             $id = $request['search']['id'];
             $list = $list->whereHas('customer', function($query)use($id){
                 $query->where('id',$id);
             });
         }
-        if($request['search']['name']){
+        if(isset($requset['search']['name']) && $request['search']['name']){
             $name =$request['search']['name'];
             $list = $list->whereHas('customer', function($query)use($name){
                 $query->where('name',$name);
@@ -135,11 +135,11 @@ class CustomerRepository
         $list = $list->with(['customer' => function($query){
             $query->select('name','id');
         }]);
-        if($request['search']['order_number']){
+        if(isset($requset['search']['order_number']) && $request['search']['order_number']){
             $order_number = $request['search']['order_number'];
             $list = $list->where("order_number",$order_number);
         }
-        if($request['search']['flow_type'] !== null){
+        if(isset($requset['search']['flow_type']) && $request['search']['flow_type'] !== null){
             $list = $list->where('flow_type',$request['search']['flow_type']);
         }
         if($agents){

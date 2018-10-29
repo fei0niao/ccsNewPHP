@@ -17,7 +17,7 @@ class AdminUsersController extends Controller
             $data = AdminUserRepository::getLoginInfo($user);
             return jsonReturn($data);
         }catch (\Exception $exception){
-            dd($exception);
+            \Log::info($exception);
             return failReturn("未知错误发生！请稍后再试！");
         }
     }
