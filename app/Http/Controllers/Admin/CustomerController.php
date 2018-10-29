@@ -200,8 +200,8 @@ class CustomerController
             return jsonReturn([],'商户充值成功');
         }catch (\Exception $exception){
             DB::rollback();
-            return failReturn('未知错误发生！');
             \Log::info($exception);
+            return failReturn('未知错误发生！');
         }
     }
 
