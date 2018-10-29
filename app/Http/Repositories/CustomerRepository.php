@@ -68,15 +68,15 @@ class CustomerRepository
         $limt = request()->input('limit');
         $request = request()->all();
         $agentId = $user->agent_id;
-        $agents = self::getAgents($agentId, 'merchant_id');
+        $agents = self::getAgents($agentId, 'id');
         $list = Order::query();
-        if(isset($requset['search']['id']) && $request['search']['id']){
+        if(isset($request['search']['id']) && $request['search']['id']){
             $id = $request['search']['id'];
             $list = $list->whereHas('customer', function($query)use($id){
                 $query->where('id',$id);
             });
         }
-        if(isset($requset['search']['name']) && $request['search']['name']){
+        if(isset($request['search']['name']) && $request['search']['name']){
             $name =$request['search']['name'];
             $list = $list->whereHas('customer', function($query)use($name){
                 $query->where('name',$name);
@@ -85,17 +85,19 @@ class CustomerRepository
         $list = $list->with(['customer' => function($query){
             $query->select("merchant_id",'name','id');
         }]);
-        if(isset($requset['search']['orderNum']) && $request['search']['orderNum']){
+        if(isset($request['search']['orderNum']) && $request['search']['orderNum']){
             $orderNum = $request['search']['orderNum'];
             $list = $list->where(function($query)use($orderNum){
                 return $query->where("trade_order_id",$orderNum)->orWhere("order_number",$orderNum);
             });
         }
-        if(isset($requset['search']['status']) && $request['search']['status'] !== null){
+        if(isset($request['search']['status']) && $request['search']['status'] !== null){
             $list = $list->where('status',$request['search']['status']);
         }
         if($agents){
-            $list = $list->whereIn('merchant_id',$agents);
+            $list = $list->whereHas('customer', function($query)use($agents){
+                $query->whereIn('agent_id',$agents);
+            });
         }
         $list=$list->orderBy('id',"DESC");
         // 有offset 认为为导出
@@ -120,13 +122,13 @@ class CustomerRepository
         $agentId = $user->agent_id;
         $agents = self::getAgents($agentId, 'id');
         $list = CustAccountFlow::query();
-        if(isset($requset['search']['id']) && $request['search']['id']){
+        if(isset($request['search']['id']) && $request['search']['id']){
             $id = $request['search']['id'];
             $list = $list->whereHas('customer', function($query)use($id){
                 $query->where('id',$id);
             });
         }
-        if(isset($requset['search']['name']) && $request['search']['name']){
+        if(isset($request['search']['name']) && $request['search']['name']){
             $name =$request['search']['name'];
             $list = $list->whereHas('customer', function($query)use($name){
                 $query->where('name',$name);
@@ -135,11 +137,11 @@ class CustomerRepository
         $list = $list->with(['customer' => function($query){
             $query->select('name','id');
         }]);
-        if(isset($requset['search']['order_number']) && $request['search']['order_number']){
+        if(isset($request['search']['order_number']) && $request['search']['order_number']){
             $order_number = $request['search']['order_number'];
             $list = $list->where("order_number",$order_number);
         }
-        if(isset($requset['search']['flow_type']) && $request['search']['flow_type'] !== null){
+        if(isset($request['search']['flow_type']) && $request['search']['flow_type'] !== null){
             $list = $list->where('flow_type',$request['search']['flow_type']);
         }
         if($agents){
