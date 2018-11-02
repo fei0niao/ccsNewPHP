@@ -54,4 +54,10 @@ Route::group([
     Route::post("/orderList","Admin\CustomerController@orderList");
     Route::post("/customerFlowList","Admin\CustomerController@flowList");
     Route::post("/customerLogin/{id}","Admin\CustomerController@customerLogin");
+
+    Route::post("/adminUsers","Admin\RoleController@getList");
+    Route::post("/getRoleOption","Admin\RoleController@getOption");
+    Route::post("/getAdminInfo",'Admin\RoleController@getAdminInfo');
+    Route::post("/updateAdminInfo",'Admin\RoleController@updateAdminInfo');
+    Route::post('/createAdmin','Admin\RoleController@createAdmin');
 });

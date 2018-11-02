@@ -7,4 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class AdminApi extends Base
 {
     protected $table = "admin_api";
+    public $timestamps = false;
 }

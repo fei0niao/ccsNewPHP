@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Http\Model\AdminUser;
 use App\Http\Model\Agent;
 use App\Http\Model\Customer;
 use App\Http\Model\User;
+use App\Observer\AdminUserObserver;
 use App\Observer\AgentObserver;
 use App\Observer\CustomerObserver;
 use App\Observer\UserObserver;
@@ -25,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.debug')) {
             \DB::enableQueryLog();
         }
-        User::observe(UserObserver::class);
+        AdminUser::observe(AdminUserObserver::class);
         Agent::observe(AgentObserver::class);
         Customer::observe(CustomerObserver::class);
     }
